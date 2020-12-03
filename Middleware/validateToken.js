@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken'); 
 const User = require('../db').import('../models/user'); 
 
-const validateUser = (req, res, next) => { 
+const validateToken = (req, res, next) => { 
     const token = req.headers.authorization; 
 
     if (!token){ 
@@ -28,4 +28,4 @@ const validateUser = (req, res, next) => {
     }
 };
 
-module.exports = validateUser;
+module.exports = validateToken;
