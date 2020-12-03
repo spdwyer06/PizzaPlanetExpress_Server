@@ -5,6 +5,7 @@ const db = require('./db');
 
 
 db.sync();
+app.use(require('./Middleware/headers'));
 app.use(Express.json());
 
 
