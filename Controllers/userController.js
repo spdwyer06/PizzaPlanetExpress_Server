@@ -10,9 +10,10 @@ router.post('/create', (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         password: req.body.password,
-        passwordEncrypted: bcrypt.hashSync(req.body.password, 13),
+        passwordEncrypted: bcrypt.hashSync(req.body.password.toString(), 13),
+        // passwordEncrypted: bcrypt.encodeBase64(req.body.password, 13),
         isManager: req.body.isManager
-    }
+    };
 
     User.create(userModel)
         .then(user => {
@@ -32,7 +33,7 @@ router.post('/login', (req, res) => {
     User.findOne({where: {password: req.body.password}})
         .then(user => {
             if(user){
-                bcrypt.compare(req.body.passwordEncrypted, user.passwordEncrypted, (err, match) => {
+                bcrypt.compare(req.body.password.toString(), user.passwordEncrypted, (err, match) => {
                     if(match){
                         const token = jwt.sign({id: user.id}, process.env.JWT, {expiresIn: '7d'});
                         

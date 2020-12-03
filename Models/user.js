@@ -22,10 +22,12 @@ module.exports = (sequelize, DataTypes) => {
             validate: {notEmpty: true}
         },
         passwordEncrypted: {
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING
         },
         isManager: {
             type: DataTypes.BOOLEAN,
         }
     });
+
+    return User;
 }
