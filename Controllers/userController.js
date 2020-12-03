@@ -21,12 +21,12 @@ router.post('/create', (req, res) => {
             const token = jwt.sign({id: user.id}, process.env.JWT, {expiresIn: '7d'});
 
             res.status(200).json({
-                user: user,
-                token: token,
-                message: 'User successfully created'
+                User: user,
+                User_Token: token,
+                Message: 'User successfully created'
             });
         })
-        .catch(err => res.status(500).json({error: err}));
+        .catch(err => res.status(500).json({Error: err}));
 });
 
 // User Login
