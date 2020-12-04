@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const MenuItem = require('../db').import('../Models/menuItem');
-const e = require('express');
 const validateToken = require('../Middleware/validateToken');
 
 // Create Menu Item

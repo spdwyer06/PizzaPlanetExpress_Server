@@ -11,6 +11,8 @@ app.use(Express.json());
 
 app.use('/user', require('./Controllers/userController'));
 app.use('/menuItem', require('./Controllers/menuItemController'));
+//? Need to research db associations
+// app.use('/order', require('./Controllers/orderController'));
 
 
 app.listen(process.env.PORT, () => console.log(`Server is running on Port ${process.env.PORT}`));
