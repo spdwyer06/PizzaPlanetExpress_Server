@@ -9,4 +9,14 @@ db.authenticate()
     .then(() => console.log('Postgres db connected'))
     .catch(err => console.log(err));
 
+User = db.import('./Models/user');
+Hours = db.import('./Models/hours');
+MenuItem = db.import('./Models/menuItem');
+Order = db.import('./Models/order');
+
+Hours.belongsTo(User);
+User.hasMany(Hours);
+
+
+
 module.exports = db;

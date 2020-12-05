@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         isManager: {
             type: DataTypes.BOOLEAN,
+        },
+        isAdmin: {
+            type: DataTypes.BOOLEAN
         }
     });
 
