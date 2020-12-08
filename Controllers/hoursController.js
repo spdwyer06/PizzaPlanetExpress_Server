@@ -5,13 +5,13 @@ const validateToken = require('../Middleware/validateToken');
 
 // Create Hours (Clock-In)
 router.post('/clockIn', validateToken, (req, res) => {
-    let today = new Date();
-    // const day = String(today.getDate()).padStart(2, '0');
-    // const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = today.getDay();
-    const month = today.getMonth() + 1;
-    const year = today.getFullYear();
-    today = `${month}/${day}/${year}`;
+    // let today = new Date();
+    // // const day = String(today.getDate()).padStart(2, '0');
+    // // const month = String(today.getMonth() + 1).padStart(2, '0');
+    // const day = today.getDay();
+    // const month = today.getMonth() + 1;
+    // const year = today.getFullYear();
+    // today = `${month}/${day}/${year}`;
 
     // const hour = today.getHours();
     // const minute = today.getMinutes();
@@ -25,13 +25,14 @@ router.post('/clockIn', validateToken, (req, res) => {
     const second = rightNow.getSeconds();
     rightNow = `${hour}:${minute}:${second}`;
     
-    const x = new Date().toLocaleDateString();
-    console.log('aelefselfsaswijdswl!!!!!', x);
+    const today = new Date().toLocaleDateString();
+    // console.log('!!!!!!!!!!!aelefselfsaswijdswl!!!!!', today);
 
     const hoursModel = {
         employeeId: req.user.id,
-        date: x,
-        clockIn: rightNow
+        date: today,
+        clockIn: rightNow,
+        userId: req.user.id
     };
 
     Hours.create(hoursModel)
@@ -52,7 +53,7 @@ router.get('/all', validateToken, (req,res) => {
 });
 
 // Get All Posted Hours By User Id
-router.get('/:userId', validateToken, (req, res) =>{
+router.get('/all/:userId', validateToken, (req, res) =>{
     if(req.user.isManager){
         Hours.findAll({where: {userId: req.params.userId}})
             .then(hours => res.status(200).json({
@@ -64,6 +65,13 @@ router.get('/:userId', validateToken, (req, res) =>{
     else{
         res.status(403).json({Error: 'Not Authorized'});
     }
+});
+
+// Get Hours By Hours Id
+router.get('/:hoursId', validateToken, (req, res) => {
+    Hours.findOne({where: {id: req.params.hoursId}})
+        .then(hours => res.status(200).json({Hours: hours}))
+        .catch(err => res.status(500).json({Error: err}));
 });
 
 // Update Hours By Hour Id (Clock-Out)
@@ -84,7 +92,7 @@ router.put('/:hoursId', validateToken, (req, res) => {
 });
 
 // Update User Hours By User Id 
-router.put('/:userId', validateToken, (req, res) => {
+router.put('/user/:userId', validateToken, (req, res) => {
     const hoursModel = {
         clockIn: req.body.clockIn,
         clockOut: req.body.clockOut

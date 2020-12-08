@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const validateToken = require('../Middleware/validateToken');
 // const validateManager = require('../Middleware/validateManager');
 
-// User Create
+// Create User
 router.post('/create', (req, res) => {
     const userModel = {
         firstName: req.body.firstName,
