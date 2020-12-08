@@ -23,7 +23,16 @@ router.post('/create', validateToken, (req, res) => {
 });
 
 // Get All Orders
-
+router.get('/all', validateToken, (req, res) => {
+    if(req.user.isManager){
+        Order.findAll()
+            .then(orders => res.status(200).json({Orders: orders}))
+            .catch(err => res.status(500).json({Error: err}));
+    }
+    else{
+        res.status(403).json({Error: 'Not Authorized'});
+    }
+});
 
 // Get Order By Order Id
 

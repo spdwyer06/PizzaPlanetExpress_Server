@@ -13,7 +13,8 @@ router.post('/create', (req, res) => {
         password: req.body.password,
         passwordEncrypted: bcrypt.hashSync(req.body.password.toString(), 13),
         // passwordEncrypted: bcrypt.encodeBase64(req.body.password, 13),
-        isManager: req.body.isManager
+        isManager: req.body.isManager,
+        isAdmin: req.body.isAdmin
     };
 
     User.create(userModel)
@@ -93,7 +94,8 @@ router.put('/:userId', validateToken, (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         password: req.body.password,
-        isManager: req.body.isManager
+        isManager: req.body.isManager,
+        isAdmin: req.body.isAdmin
     };
 
     if(req.user.isManager == true){

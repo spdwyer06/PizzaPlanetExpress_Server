@@ -12,8 +12,8 @@ module.exports = (sequelize, DataTypes) => {
         //     }
         // },
         date: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW
+            type: DataTypes.STRING,
+            // defaultValue: DataTypes.NOW
             // defaultValue: Sequelize.NOW
         },
         clockIn: {
