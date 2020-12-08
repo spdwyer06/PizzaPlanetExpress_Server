@@ -2,14 +2,14 @@
 
 module.exports = (sequelize, DataTypes) => {
     const Order = sequelize.define('order', {
-        employeeId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            validate: {
-                notEmpty: true,
-                isInt: true
-            }
-        },
+        // employeeId: {
+        //     type: DataTypes.INTEGER,
+        //     allowNull: false,
+        //     validate: {
+        //         notEmpty: true,
+        //         isInt: true
+        //     }
+        // },
         // orderTime: {
         //     type: DataTypes.DATE
         // },
@@ -45,15 +45,15 @@ module.exports = (sequelize, DataTypes) => {
         // orderDetail: {
         //     type: DataTypes.ARRAY(MenuItem),
         // },
-        orderDetail: {
-            type: DataTypes.STRING,
-            get(){
-                const val = this.getDataValue('orderDetail');
-                return val;
-            }
-            // get: () => JSON.parse(this.getDataValue(orderDetail)),
-            // set: (val) => this.setDataValue('orderDetail', JSON.stringify(val))
-        },
+        // orderDetail: {
+        //     type: DataTypes.STRING,
+        //     get(){
+        //         const val = this.getDataValue('orderDetail');
+        //         return val;
+        //     }
+        //     // get: () => JSON.parse(this.getDataValue(orderDetail)),
+        //     // set: (val) => this.setDataValue('orderDetail', JSON.stringify(val))
+        // },
         isPaid: {
             type: DataTypes.BOOLEAN,
             allowNull: false

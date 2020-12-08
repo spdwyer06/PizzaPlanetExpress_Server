@@ -1,18 +1,20 @@
 // const { Sequelize } = require("sequelize/types");
-
+// 'use strict';
 module.exports = (sequelize, DataTypes) => {
     const Hours = sequelize.define('hours', {
-        employeeId: {
-            type: DataTypes.INTEGER, 
-            allowNull: false,
-            validate: {
-                notEmpty: true,
-                isInt: true
-            }
-        },
+        // Not needed since it will be automatically be created through db association in db.js
+        // employeeId: {
+        //     type: DataTypes.INTEGER, 
+        //     allowNull: false,
+        //     validate: {
+        //         notEmpty: true,
+        //         isInt: true
+        //     }
+        // },
         date: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW
+            // defaultValue: Sequelize.NOW
         },
         clockIn: {
             type: DataTypes.TIME,

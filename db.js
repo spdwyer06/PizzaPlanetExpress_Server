@@ -13,9 +13,19 @@ User = db.import('./Models/user');
 Hours = db.import('./Models/hours');
 MenuItem = db.import('./Models/menuItem');
 Order = db.import('./Models/order');
+OrderItem = db.import('./Models/orderItem');
 
-Hours.belongsTo(User);
+// User 1:M Hours
 User.hasMany(Hours);
+Hours.belongsTo(User);
+
+// User 1:M Order
+User.hasMany(Order);
+Order.belongsTo(User);
+
+// Order M:M MenuItem
+Order.belongsToMany(MenuItem, {through: OrderItem});
+MenuItem.belongsToMany(Order, {through: OrderItem});
 
 
 
