@@ -10,7 +10,7 @@ router.post('/create', validateToken, (req, res) => {
         customerLastName: req.body.customerLastName,
         customerPhoneNumber: req.body.customerPhoneNumber,
         totalPrice: req.body.totalPrice,
-        orderDetail: req.body.orderDetail,
+        // orderDetail: req.body.orderDetail,
         isPaid: req.body.isPaid
     };
 

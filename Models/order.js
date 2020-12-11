@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
                 isDecimal: true
             }
         },
+        // orderDate: {
+        //     type: DataTypes.DATE,
+        //     defaultValue: new Date()
+        // }
         // orderDetail: {
         //     type: DataTypes.ARRAY(MenuItem),
         // },

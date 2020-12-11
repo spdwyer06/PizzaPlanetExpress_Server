@@ -12,7 +12,7 @@ app.use(Express.json());
 app.use('/user', require('./Controllers/userController'));
 app.use('/menuItem', require('./Controllers/menuItemController'));
 //? Need to research db associations
-// app.use('/order', require('./Controllers/orderController'));
+app.use('/order', require('./Controllers/orderController'));
 app.use('/hours', require('./Controllers/hoursController'));
 
 
