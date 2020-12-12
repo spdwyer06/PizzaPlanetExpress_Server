@@ -28,19 +28,22 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         customerPhoneNumber: {
-            type: DataTypes.INTEGER,
-            validate: {
-                min: 9,
-                max: 100,
-                msg: 'Enter 10-digit phone number (including area code)'
-            }
+            type: DataTypes.INTEGER
+            // validate: {
+            //     min: 9,
+            //     max: 100,
+            //     msg: 'Enter 10-digit phone number (including area code)'
+            // }
         },
         totalPrice: {
             type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
+            // allowNull: false,
             validate: {
                 isDecimal: true
             }
+        },
+        orderDetail: {
+            type: DataTypes.ARRAY(DataTypes.INTEGER)
         },
         // orderDate: {
         //     type: DataTypes.DATE,
