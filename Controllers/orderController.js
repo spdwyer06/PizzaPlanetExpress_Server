@@ -130,22 +130,34 @@ router.delete('/:orderId', validateToken, (req, res) => {
     }
 });
 
-
+//  ?        Async Update Order
 router.put('/:orderId', validateToken, async (req, res) => {
     let orderTotal = 0;
 
     const order = await Order.findOne({where: {id: req.params.orderId}});
 
-    await order.orderDetail.forEach(itemId => {
-        const item = MenuItem.findOne({where: {id: itemId}});
+    // await order.orderDetail.forEach(async itemId => {
+    //     const item = await MenuItem.findOne({where: {id: itemId}});
+    //     orderTotal += parseFloat(item.price).valueOf(item.price);
+
+    //     console.log('Menu Item: ', item.name);
+    //     console.log('Item Price: ', item.price);
+    //     console.log('Order Total: ', orderTotal);
+    // });
+    
+    // IT WORKS!!!!!!!!
+    for(const itemId of order.orderDetail){
+        const item = await MenuItem.findOne({where: {id: itemId}});
         orderTotal += parseFloat(item.price).valueOf(item.price);
+        // orderTotal += item.price;
 
-        console.log('Menu Item: ', item);
-        console.log('Item Price: ', item.price);
-        console.log('Order Total: ', orderTotal);
-    });
+        console.log('For Of Menu Item: ', item.name);
+        console.log('For Of Item Price: ', item.price);
+        console.log('For Of Order Total: ', orderTotal);
+    }
 
-    console.log('Order Total: ', orderTotal);
+    const logs = async() => console.log('Order Total After Loop: ', orderTotal);
+    await logs();
 
     const orderModel = {
         customerFirstName: req.body.customerFirstName,
@@ -154,6 +166,9 @@ router.put('/:orderId', validateToken, async (req, res) => {
         totalPrice: orderTotal,
         isPaid: req.body.isPaid
     };
+
+    console.log('Order Model Total Price: ', orderModel.totalPrice);
+    console.log('Order Total Going Into Model: ', orderTotal);
 
     await Order.update(orderModel, {where: {id: req.params.orderId}});
     res.status(200).json({Message: 'Order successfully updated'});
