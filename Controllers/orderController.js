@@ -24,17 +24,35 @@ router.post('/create', validateToken, (req, res) => {
 });
 
 // Add Items To Order By Order Id
-router.put('/add/:orderId', validateToken, (req, res) => {
-    const items = {
-        orderDetail: req.body.orderDetail
+router.put('/add/:orderId', validateToken, async(req, res) => {
+    let orderTotal = 0;
+
+    for(const itemId of req.body.orderDetail){
+        const item = await MenuItem.findOne({where: {id: itemId}});
+        orderTotal += parseFloat(item.price).valueOf(item.price);
+    }
+
+    const orderModel = {
+        orderDetail: req.body.orderDetail,
+        totalPrice: orderTotal
     };
 
-    Order.update(items, {where: {id: req.params.orderId}})
+    Order.update(orderModel, {where: {id: req.params.orderId}})
         .then(() => res.status(200).json({Message: 'Item(s) added to order'}))
         .catch(err => res.status(500).json({Error: err}));
 });
 
-//! Not showing order total if items are added to order (Unless already updated)
+//? (Old) Add Items To Order By Order Id
+// router.put('/add/:orderId', validateToken, (req, res) => {
+//     const items = {
+//         orderDetail: req.body.orderDetail
+//     };
+
+//     Order.update(items, {where: {id: req.params.orderId}})
+//         .then(() => res.status(200).json({Message: 'Item(s) added to order'}))
+//         .catch(err => res.status(500).json({Error: err}));
+// });
+
 // Get All Orders
 router.get('/all', validateToken, (req, res) => {
     Order.findAll()
@@ -42,7 +60,6 @@ router.get('/all', validateToken, (req, res) => {
             .catch(err => res.status(500).json({Error: err}));
 });
 
-//! Not showing order total if items are added to order (Unless already updated)
 // Get Order By Order Id
 router.get('/:orderId', validateToken, (req, res) => {
     Order.findOne({where: {id: req.params.orderId}})
@@ -50,7 +67,6 @@ router.get('/:orderId', validateToken, (req, res) => {
         .catch(err => res.status(500).json({Error: err}));
 });
 
-//! Not showing order total if items are added to order (Unless already updated)
 // Get All Orders By Customer Phone Number
 router.get('/cust/:phone', validateToken, (req, res) => {
     Order.findAll({where: {customerPhoneNumber: req.params.phone}})
@@ -58,7 +74,6 @@ router.get('/cust/:phone', validateToken, (req, res) => {
         .catch(err => res.status(500).json({Error: err}));
 });
 
-//! Not showing order total if items are added to order (Unless already updated)
 // Get All Orders By User Id
 router.get('/user/:userId', validateToken, (req, res) => {
     Order.findAll({where: {userId: req.params.userId}})
@@ -66,7 +81,6 @@ router.get('/user/:userId', validateToken, (req, res) => {
         .catch(err => res.status(500).json({Error: err}));
 });
 
-//! Not showing order total if items are added to order (Unless already updated)
 // Get All Un-paid Orders
 router.get('/paid/unpaid', validateToken, (req, res) => {
     Order.findAll({where: {isPaid: false}})
@@ -74,7 +88,6 @@ router.get('/paid/unpaid', validateToken, (req, res) => {
         .catch(err => res.status(500).json({Error: err}));
 });
 
-//! Not showing order total if items are added to order (Unless already updated)
 // Get All Paid Orders
 router.get('/paid/paid', validateToken, (req, res) => {
     Order.findAll({where: {isPaid: true}})
@@ -136,7 +149,7 @@ router.delete('/:orderId', validateToken, (req, res) => {
     }
 });
 
-//  ?        Async Update Order
+//  ?        Async Update Order (Working)
 router.put('/:orderId', validateToken, async (req, res) => {
     let orderTotal = 0;
 
@@ -180,7 +193,7 @@ router.put('/:orderId', validateToken, async (req, res) => {
     try{
         res.status(200).json({Message: 'Order successfully updated'});
     }
-    catch{
+    catch(err){
         res.status(500).json({Error: err});
     }
 
