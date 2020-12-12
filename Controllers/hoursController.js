@@ -91,6 +91,7 @@ router.put('/:hoursId', validateToken, (req, res) => {
     }
 });
 
+//! Is updating all hours posted by user, needs refactoring
 // Update User Hours By User Id 
 router.put('/user/:userId', validateToken, (req, res) => {
     const hoursModel = {

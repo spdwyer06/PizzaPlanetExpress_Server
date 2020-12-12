@@ -100,7 +100,7 @@ router.put('/:userId', validateToken, (req, res) => {
 
     if(req.user.isManager == true){
         User.update(userModel, {where: {id: req.params.userId}})
-            .then(user => res.status(200).json({Updated_User: `Successfully updated user with user id: ${user}`}))
+            .then(user => res.status(200).json({Updated_User: 'Successfully updated user'}))
             .catch(err => res.status(500).json({Error: err}));
     }
     else{

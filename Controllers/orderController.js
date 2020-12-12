@@ -34,6 +34,7 @@ router.put('/add/:orderId', validateToken, (req, res) => {
         .catch(err => res.status(500).json({Error: err}));
 });
 
+//! Not showing order total if items are added to order (Unless already updated)
 // Get All Orders
 router.get('/all', validateToken, (req, res) => {
     Order.findAll()
@@ -41,6 +42,7 @@ router.get('/all', validateToken, (req, res) => {
             .catch(err => res.status(500).json({Error: err}));
 });
 
+//! Not showing order total if items are added to order (Unless already updated)
 // Get Order By Order Id
 router.get('/:orderId', validateToken, (req, res) => {
     Order.findOne({where: {id: req.params.orderId}})
@@ -48,6 +50,7 @@ router.get('/:orderId', validateToken, (req, res) => {
         .catch(err => res.status(500).json({Error: err}));
 });
 
+//! Not showing order total if items are added to order (Unless already updated)
 // Get All Orders By Customer Phone Number
 router.get('/cust/:phone', validateToken, (req, res) => {
     Order.findAll({where: {customerPhoneNumber: req.params.phone}})
@@ -55,6 +58,7 @@ router.get('/cust/:phone', validateToken, (req, res) => {
         .catch(err => res.status(500).json({Error: err}));
 });
 
+//! Not showing order total if items are added to order (Unless already updated)
 // Get All Orders By User Id
 router.get('/user/:userId', validateToken, (req, res) => {
     Order.findAll({where: {userId: req.params.userId}})
@@ -62,6 +66,7 @@ router.get('/user/:userId', validateToken, (req, res) => {
         .catch(err => res.status(500).json({Error: err}));
 });
 
+//! Not showing order total if items are added to order (Unless already updated)
 // Get All Un-paid Orders
 router.get('/paid/unpaid', validateToken, (req, res) => {
     Order.findAll({where: {isPaid: false}})
@@ -69,6 +74,7 @@ router.get('/paid/unpaid', validateToken, (req, res) => {
         .catch(err => res.status(500).json({Error: err}));
 });
 
+//! Not showing order total if items are added to order (Unless already updated)
 // Get All Paid Orders
 router.get('/paid/paid', validateToken, (req, res) => {
     Order.findAll({where: {isPaid: true}})
@@ -171,7 +177,12 @@ router.put('/:orderId', validateToken, async (req, res) => {
     console.log('Order Total Going Into Model: ', orderTotal);
 
     await Order.update(orderModel, {where: {id: req.params.orderId}});
-    res.status(200).json({Message: 'Order successfully updated'});
+    try{
+        res.status(200).json({Message: 'Order successfully updated'});
+    }
+    catch{
+        res.status(500).json({Error: err});
+    }
 
 });
 
