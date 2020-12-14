@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
             validate: {
                 isDecimal: true,
                 notNull: {
-                    msg: 'Enter the item name.'
+                    msg: 'Enter the item price.'
                 }
             }
         }

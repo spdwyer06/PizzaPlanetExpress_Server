@@ -91,15 +91,34 @@ router.put('/:hoursId', validateToken, (req, res) => {
     }
 });
 
+//! Is updating all hours posted by user, needs refactoring
 // Update User Hours By User Id 
-router.put('/user/:userId', validateToken, (req, res) => {
+// router.put('/user/:userId', validateToken, (req, res) => {
+//     const hoursModel = {
+//         clockIn: req.body.clockIn,
+//         clockOut: req.body.clockOut
+//     };
+
+//     if(req.user.isAdmin){
+//         Hours.update(hoursModel, {where: {userId: req.params.userId}})
+//             // .then(hours => res.status(200).json({Hours: hours}))
+//             .then(() => res.status(200).json({Message: 'Hours successfully updated'}))
+//             .catch(err => res.status(500).json({Error: err}));
+//     }
+//     else{
+//         res.status(403).json({Error: 'Not Authorized'});
+//     }
+// });
+
+router.put('/user/:userId/:hoursId', validateToken, (req, res) => {
     const hoursModel = {
         clockIn: req.body.clockIn,
         clockOut: req.body.clockOut
     };
 
     if(req.user.isAdmin){
-        Hours.update(hoursModel, {where: {userId: req.params.userId}})
+        // Hours.findOne({where:{id: req.params.hoursId}})
+        Hours.update(hoursModel, {where: {userId: req.params.userId, id: req.params.hoursId}})
             // .then(hours => res.status(200).json({Hours: hours}))
             .then(() => res.status(200).json({Message: 'Hours successfully updated'}))
             .catch(err => res.status(500).json({Error: err}));
