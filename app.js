@@ -12,9 +12,9 @@ app.use(Express.json());
 
 app.use('/user', require('./Controllers/userController'));
 app.use('/menuItem', require('./Controllers/menuItemController'));
-//? Need to research db associations
 app.use('/order', require('./Controllers/orderController'));
 app.use('/hours', require('./Controllers/hoursController'));
+app.use('/customer', require('./Controllers/customerController'));
 
 
 app.listen(process.env.PORT, () => console.log(`Server is running on Port ${process.env.PORT}`));

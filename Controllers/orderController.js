@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const Order = require('../db').import('../Models/order');
 const validateToken = require('../Middleware/validateToken');
+const Order = require('../db').import('../Models/order');
 const MenuItem = require('../db').import('../Models/menuItem');
 const User = require('../db').import('../Models/user');
 
@@ -70,7 +70,12 @@ router.put('/add/:orderId', validateToken, async(req, res) => {
 router.get('/all', validateToken, async(req, res) => {
     try{
         const orders = await Order.findAll();
-        res.status(200).json({Orders: orders});
+        if(orders.length > 0){
+            res.status(200).json({Orders: orders});
+        }
+        else{
+            res.status(418).json({Message: 'No Orders In System Yet'});
+        }
     }
     catch(err){
         res.status(500).json({Error: err});
