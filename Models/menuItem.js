@@ -4,7 +4,8 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                notNull: {
+                isAlpha: true,
+                notEmpty: {
                     msg: 'Enter the item name.'
                 }
             }

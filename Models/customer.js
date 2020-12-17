@@ -4,14 +4,17 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                notEmpty: true
+                notEmpty: true,
+                // Validates that only letters are inserted
+                isAlpha: true
             }
         },
         lastName: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                notEmpty: true
+                notEmpty: true,
+                isAlpha: true
             }
         },
         phoneNumber: {
@@ -21,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
                 isInt: true,
                 notEmpty: true,
                 len: {
+                    // Validating that a 10-digit phone number is entered
                     args: [10, 10],
                     msg: 'Enter 10-digit phone number (including area code)'
                 }

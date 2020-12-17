@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
+                isAlpha: true,
                 notNull: {
                     msg: 'Enter a first name.'
                 }
@@ -12,14 +13,20 @@ module.exports = (sequelize, DataTypes) => {
         lastName: {
             type: DataTypes.STRING,
             allowNull: false,
-            validate: {notEmpty: true}
+            validate: {
+                notEmpty: true,
+                isAlpha: true
+            }
         },
         password: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            isInt: true,
-            len: [4, 4],
-            validate: {notEmpty: true}
+            isUnique: true,
+            validate: {
+                notNull: true,
+                isInt: true,
+                len: [4, 4],
+            }
         },
         passwordEncrypted: {
             type: DataTypes.STRING

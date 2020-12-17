@@ -2,38 +2,9 @@
 
 module.exports = (sequelize, DataTypes) => {
     const Order = sequelize.define('order', {
-        // employeeId: {
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        //     validate: {
-        //         notEmpty: true,
-        //         isInt: true
-        //     }
-        // },
-        // orderTime: {
-        //     type: DataTypes.DATE
-        // },
-        customerFirstName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notEmpty: true
-            }
-        },
-        customerLastName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notEmpty: true
-            }
-        },
-        customerPhoneNumber: {
-            type: DataTypes.INTEGER
-            // validate: {
-            //     min: 9,
-            //     max: 100,
-            //     msg: 'Enter 10-digit phone number (including area code)'
-            // }
+        orderTime: {
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW
         },
         totalPrice: {
             type: DataTypes.DECIMAL(10, 2),
