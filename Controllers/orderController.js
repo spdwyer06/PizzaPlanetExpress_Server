@@ -3,15 +3,15 @@ const validateToken = require('../Middleware/validateToken');
 const Order = require('../db').import('../Models/order');
 const MenuItem = require('../db').import('../Models/menuItem');
 const User = require('../db').import('../Models/user');
+const Customer = require('../db').import('../Models/customer');
 
-// Create An Order
-router.post('/create', validateToken, async(req, res) => {
+
+
+// Create Starting Order
+router.post('/create/:customerId', validateToken, async(req, res) => {
     const orderModel = {
         userId: req.user.id,
-        customerFirstName: req.body.customerFirstName,
-        customerLastName: req.body.customerLastName,
-        customerPhoneNumber: req.body.customerPhoneNumber,
-        // Have default value set to false, then this won't be needed
+        customerId: req.params.customerId,
         isPaid: req.body.isPaid
     };
 
@@ -20,11 +20,25 @@ router.post('/create', validateToken, async(req, res) => {
         res.status(200).json({
             Message: 'Starting order successfully created',
             //? Needed since order will just be an empty order to begin with???
-            // Order: order
+            Order: order
         });
     }
     catch{
         res.status(200).json({Error: err});
+    }
+});
+
+// Add Item By Item Id To Order By Order Id
+router.put('/food/:itemId/add/:orderId', validateToken, async(req, res) => {
+    try{
+        const order = await Order.findOne({where: {id: req.params.orderId}});
+        const menuItem = await MenuItem.findOne({where: {id: req.params.itemId}});
+        const addItem = await order.addMenuItem(menuItem, {through: {quantity: req.body.quantity, specialInstructions: req.body.specialInstructions}});
+        
+        res.status(200).json({Added_Item: addItem});
+    }
+    catch(err){
+        res.status(500).json({Error: err});
     }
 });
 
@@ -69,7 +83,10 @@ router.put('/add/:orderId', validateToken, async(req, res) => {
 // Get All Orders
 router.get('/all', validateToken, async(req, res) => {
     try{
-        const orders = await Order.findAll();
+        let orders = await Order.findAll({include: [
+            {model: MenuItem, attributes: ['name', 'price'], through: {attributes: []}}, 
+            {model: Customer, attributes: ['firstName', 'lastName']}
+        ]});
         if(orders.length > 0){
             res.status(200).json({Orders: orders});
         }
