@@ -85,7 +85,7 @@ router.get('/all', validateToken, async(req, res) => {
     try{
         let orders = await Order.findAll({include: [
             {model: MenuItem, attributes: ['name', 'price'], through: {attributes: []}}, 
-            {model: Customer, attributes: ['firstName', 'lastName']}
+            {model: Customer, attributes: ['firstName', 'lastName', 'phoneNumber']}
         ]});
         if(orders.length > 0){
             res.status(200).json({Orders: orders});
