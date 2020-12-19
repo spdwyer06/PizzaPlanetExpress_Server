@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         phoneNumber: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            isUnique: true,
             validate: {
                 isInt: true,
                 notEmpty: true,

@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
         // },
         isPaid: {
             type: DataTypes.BOOLEAN,
-            allowNull: false
+            defaultValue: false
         }
     });
 

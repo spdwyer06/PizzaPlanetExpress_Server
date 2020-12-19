@@ -2,11 +2,15 @@ module.exports = (sequelize, DataTypes) => {
     const OrderItem = sequelize.define('orderItem', {
         quantity: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            defaultValue: 1,
+           // allowNull: false,
             validate: {
-                notNull: true,
+               // notNull: true,
                 isInt: true
             }
+        },
+        specialInstructions: {
+            type: DataTypes.TEXT
         }
     });
 
