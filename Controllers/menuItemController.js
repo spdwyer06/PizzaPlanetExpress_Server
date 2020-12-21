@@ -12,7 +12,7 @@ router.post('/create', validateToken, async(req, res) => {
         try{
             const item = await MenuItem.create(menuItemModel);
             res.status(200).json({
-                Message: 'Menu Item successfully created',
+                Message: 'Menu Item Successfully Created',
                 Menu_Item: item
             });
         }
@@ -25,12 +25,10 @@ router.post('/create', validateToken, async(req, res) => {
     }
 });
 
-//? Manager Auth Needed???
 // Get All Menu Items
 router.get('/all', validateToken, async(req, res) => {
-    // if(req.user.isManager == true){
         try{
-            const items = await MenuItem.findAll();
+            const items = await MenuItem.findAll({attributes: {exclude: ['createdAt', 'updatedAt']}});
             if(items.length > 0){
                 res.status(200).json({Menu_Items: items});
             }
@@ -41,16 +39,10 @@ router.get('/all', validateToken, async(req, res) => {
         catch(err){
             res.status(500).json({Error: err});
         }
-    // }
-    // else{
-    //     res.status(403).json({Error: 'Not Authorized'});
-    // }
 });
 
-//? Manager Auth Needed???
 // Get Menu Item By Id
 router.get('/:itemId', validateToken, async(req, res) => {
-    // if(req.user.isManager == true){
         try{
             const item = await MenuItem.findOne({where: {id: req.params.itemId}});
             if(item){
@@ -63,10 +55,6 @@ router.get('/:itemId', validateToken, async(req, res) => {
         catch(err){
             res.status(500).json({Error: err});
         }
-    // }
-    // else{
-    //     res.status(403).json({Error: 'Not Authorized'});
-    // }
 });
 
 // Update Menu Item By Id
