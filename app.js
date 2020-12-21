@@ -12,10 +12,10 @@ app.use(Express.json());
 
 app.use('/user', require('./Controllers/userController'));
 app.use('/menuItem', require('./Controllers/menuItemController'));
+app.use('/customer', require('./Controllers/customerController'));
 // Currently Under Final Testing
 app.use('/order', require('./Controllers/orderController'));
 app.use('/hours', require('./Controllers/hoursController'));
-app.use('/customer', require('./Controllers/customerController'));
 
 
 app.listen(process.env.PORT, () => console.log(`Server Is Running On Port ${process.env.PORT}`));

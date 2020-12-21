@@ -25,7 +25,7 @@ router.route('/')
     // Get All Customers
     .get(validateToken, async(req, res) => {
         try{
-            const customers = await Customer.findAll();
+            const customers = await Customer.findAll({attributes: {exclude: ['createdAt', 'updatedAt']}});
             if(customers.length > 0){
                 res.status(200).json({Customers: customers});
             }
@@ -41,7 +41,7 @@ router.route('/')
 // Get Customer By Customer Id
 router.get('/:customerId', validateToken, async(req, res) => {
     try{
-        const customer = await Customer.findOne({where: {id: req.params.customerId}});
+        const customer = await Customer.findOne({where: {id: req.params.customerId}, attributes: {exclude: ['createdAt', 'updatedAt']}});
         if(customer){
             res.status(200).json({Customer: customer});
         }
@@ -57,7 +57,7 @@ router.get('/:customerId', validateToken, async(req, res) => {
 // Get Customer By Last Name
 router.get('/name/:lastName', validateToken, async(req, res) => {
     try{
-        const customers = await Customer.findAll({where: {lastName: req.params.lastName}});
+        const customers = await Customer.findAll({where: {lastName: req.params.lastName}, attributes: {exclude: ['createdAt', 'updatedAt']}});
         if(customers.length > 0){
             res.status(200).json({Customers: customers});
         }
@@ -73,7 +73,7 @@ router.get('/name/:lastName', validateToken, async(req, res) => {
 // Get Customer By Phone Number
 router.get('/phone/:number', validateToken, async(req, res) => {
     try{
-        const customer = await Customer.findOne({where: {phoneNumber: req.params.number}});
+        const customer = await Customer.findOne({where: {phoneNumber: req.params.number}, attributes: {exclude: ['createdAt', 'updatedAt']}});
         if(customer){
             res.status(200).json({Customer: customer});
         }

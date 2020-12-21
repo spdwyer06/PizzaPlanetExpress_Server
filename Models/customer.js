@@ -18,12 +18,12 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         phoneNumber: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.BIGINT,
             allowNull: false,
-            isUnique: true,
+            unique: true,
             validate: {
                 isInt: true,
-                notEmpty: true,
+                notNull: true,
                 len: {
                     // Validating that a 10-digit phone number is entered
                     args: [10, 10],
