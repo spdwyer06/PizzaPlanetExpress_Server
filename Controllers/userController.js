@@ -22,7 +22,7 @@ router.post('/create', async(req, res) => {
         res.status(200).json({
             User: user,
             User_Token: token,
-            Message: 'User successfully created'
+            Message: 'User Successfully Created'
         });
     }
     catch(err){
@@ -42,7 +42,7 @@ router.post('/login', async(req, res) => {
                     res.status(200).json({
                         user: user,
                         token: token,
-                        message: 'User successfully logged in'
+                        message: 'User Successfully Logged In'
                     });
                 }
                 else{
@@ -51,7 +51,7 @@ router.post('/login', async(req, res) => {
             });
         }
         else{
-            res.status(500).json({Error: 'User does not exist'});
+            res.status(500).json({Error: 'User Does Not Exist'});
         }
     }
     catch(err){
@@ -63,7 +63,7 @@ router.post('/login', async(req, res) => {
 router.get('/all', validateToken, async(req, res) => {
     if(req.user.isManager){
         try{
-            const users = await User.findAll();
+            const users = await User.findAll({attributes: {exclude: ['passwordEncrypted', 'createdAt', 'updatedAt']}});
             res.status(200).json({Users: users});
         }
         catch(err){
@@ -79,13 +79,13 @@ router.get('/all', validateToken, async(req, res) => {
 router.get('/:userId', validateToken, async(req, res) => {
     if(req.user.isManager){
         try{
-            const user = await User.findOne({where: {id: req.params.userId}});
+            const user = await User.findOne({where: {id: req.params.userId}, attributes: {exclude: ['passwordEncrypted']}});
 
             if(user){
                 res.status(200).json({User: user});
             }
             else{
-                res.status(500).json({Error: 'User does not exist'});
+                res.status(500).json({Error: `No User Found Matching User Id: ${req.params.userId}`});
             } 
         }
         catch(err){
@@ -101,16 +101,23 @@ router.get('/:userId', validateToken, async(req, res) => {
 router.put('/:userId', validateToken, async(req, res) => {
     if(req.user.isManager){
         try{
-            const userModel = {
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                password: req.body.password,
-                isManager: req.body.isManager,
-                isAdmin: req.body.isAdmin
-            };
+            const user = await User.findOne({where: {id: req.params.userId}});
 
-            await User.update(userModel, {where: {id: req.params.userId}});
-            res.status(200).json({Updated_User: 'Successfully updated user'});
+            if(user){
+                const userModel = {
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    password: req.body.password,
+                    isManager: req.body.isManager,
+                    isAdmin: req.body.isAdmin
+                };
+    
+                await User.update(userModel, {where: {id: req.params.userId}});
+                res.status(200).json({Updated_User: 'Successfully Updated User'});
+            }
+            else{
+                res.status(500).json({Error: `No User Found Matching User Id: ${req.params.userId}`});
+            }
         }
         catch(err){
             res.status(500).json({Error: err});
@@ -125,8 +132,15 @@ router.put('/:userId', validateToken, async(req, res) => {
 router.delete('/:userId', validateToken, async(req, res) => {
     if(req.user.isAdmin){
         try{
-            await User.destroy({where: {id: req.params.userId}});
-            res.status(200).json({User_Delete: 'User has been removed from the system'});
+            const user = await User.findOne({where: {id: req.params.userId}});
+
+            if(user){
+                await User.destroy({where: {id: user.id}});
+                res.status(200).json({User_Delete: 'User Has Been Removed From The System'});
+            }
+            else{
+                res.status(500).json({Error: `No User Found Matching User Id: ${req.params.userId}`});
+            }
         }
         catch(err){
             res.status(500).json({Error: err});

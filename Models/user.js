@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         password: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            isUnique: true,
+            unique: true,
             validate: {
                 notNull: true,
                 isInt: true,
@@ -33,9 +33,11 @@ module.exports = (sequelize, DataTypes) => {
         },
         isManager: {
             type: DataTypes.BOOLEAN,
+            defaultValue: false
         },
         isAdmin: {
-            type: DataTypes.BOOLEAN
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         }
     });
 
