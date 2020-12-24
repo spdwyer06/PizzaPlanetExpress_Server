@@ -1,50 +1,28 @@
 // const MenuItem = require('./menuItem');
+const moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
     const Order = sequelize.define('order', {
-        // employeeId: {
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        //     validate: {
-        //         notEmpty: true,
-        //         isInt: true
-        //     }
-        // },
-        // orderTime: {
-        //     type: DataTypes.DATE
-        // },
-        customerFirstName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notEmpty: true
+        orderTime: {
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW,
+            get(){
+                return moment(this.getDataValue('orderTime')).format('MM/DD/YYYY h:mm:ss');
             }
-        },
-        customerLastName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notEmpty: true
-            }
-        },
-        customerPhoneNumber: {
-            type: DataTypes.INTEGER
-            // validate: {
-            //     min: 9,
-            //     max: 100,
-            //     msg: 'Enter 10-digit phone number (including area code)'
-            // }
         },
         totalPrice: {
             type: DataTypes.DECIMAL(10, 2),
-            // allowNull: false,
+            defaultValue: 0.00,
             validate: {
                 isDecimal: true
+            },
+            get(){
+                return parseFloat(this.getDataValue('totalPrice'));
             }
         },
-        orderDetail: {
-            type: DataTypes.ARRAY(DataTypes.INTEGER)
-        },
+        // orderDetail: {
+        //     type: DataTypes.ARRAY(DataTypes.INTEGER)
+        // },
         // orderDate: {
         //     type: DataTypes.DATE,
         //     defaultValue: new Date()
@@ -63,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
         // },
         isPaid: {
             type: DataTypes.BOOLEAN,
-            allowNull: false
+            defaultValue: false
         }
     });
 

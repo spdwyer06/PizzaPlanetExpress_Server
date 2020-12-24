@@ -1,18 +1,11 @@
-// const { Sequelize } = require("sequelize/types");
-// 'use strict';
 module.exports = (sequelize, DataTypes) => {
     const Hours = sequelize.define('hours', {
-        // Not needed since it will be automatically be created through db association in db.js
-        // employeeId: {
-        //     type: DataTypes.INTEGER, 
-        //     allowNull: false,
-        //     validate: {
-        //         notEmpty: true,
-        //         isInt: true
-        //     }
-        // },
         date: {
             type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notEmpty: true
+            }
             // defaultValue: DataTypes.NOW
             // defaultValue: Sequelize.NOW
         },
@@ -24,9 +17,13 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TIME
         },
         shiftLength: {
-            type: DataTypes.DECIMAL
+            type: DataTypes.DECIMAL(10, 2),
+            set(){
+                this.shiftLength = this.clockOut - this.clockIn;
+            }
         }
-    });
+    },
+    {timestamps: false});
 
     return Hours;
 }

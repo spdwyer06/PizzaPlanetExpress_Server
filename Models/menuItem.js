@@ -3,8 +3,10 @@ module.exports = (sequelize, DataTypes) => {
         name: {
             type: DataTypes.STRING,
             allowNull: false,
+            unique: true,
             validate: {
-                notNull: {
+                isAlpha: true,
+                notEmpty: {
                     msg: 'Enter the item name.'
                 }
             }
@@ -17,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
                 notNull: {
                     msg: 'Enter the item price.'
                 }
+            },
+            get(){
+                return parseFloat(this.getDataValue('price'));
             }
         }
     });

@@ -1,24 +1,10 @@
 const router = require('express').Router();
 const Hours = require('../db').import('../Models/hours');
-const e = require('express');
+const User = require('../db').import('../Models/user');
 const validateToken = require('../Middleware/validateToken');
 
 // Create Hours (Clock-In)
-router.post('/clockIn', validateToken, (req, res) => {
-    // let today = new Date();
-    // // const day = String(today.getDate()).padStart(2, '0');
-    // // const month = String(today.getMonth() + 1).padStart(2, '0');
-    // const day = today.getDay();
-    // const month = today.getMonth() + 1;
-    // const year = today.getFullYear();
-    // today = `${month}/${day}/${year}`;
-
-    // const hour = today.getHours();
-    // const minute = today.getMinutes();
-    // const second = today.getSeconds();
-
-    // const rightNow = new Date(hour, minute, second);
-
+router.post('/clockIn', validateToken, async(req, res) => {
     let rightNow = new Date();
     const hour = rightNow.getHours();
     const minute = rightNow.getMinutes();
@@ -26,26 +12,42 @@ router.post('/clockIn', validateToken, (req, res) => {
     rightNow = `${hour}:${minute}:${second}`;
     
     const today = new Date().toLocaleDateString();
-    // console.log('!!!!!!!!!!!aelefselfsaswijdswl!!!!!', today);
 
     const hoursModel = {
-        employeeId: req.user.id,
+        // employeeId: req.user.id,
         date: today,
         clockIn: rightNow,
         userId: req.user.id
     };
 
-    Hours.create(hoursModel)
-        .then(hours => res.status(200).json(hours))
-        .catch(err => res.status(500).json({Error: err}));
+
+    try{
+        const hours = await Hours.create(hoursModel);
+        res.status(200).json({ClockIn: `Clocked In At ${hours.clockIn}`});
+        // res.status(200).json(hours);
+    }
+    catch(err){
+        res.status(500).json({Error: err});
+    }
 });
 
 // Get All Posted Hours (Clock-In & Clock-Out)
-router.get('/all', validateToken, (req,res) => {
+router.get('/all', validateToken, async(req,res) => {
     if(req.user.isManager){
-        Hours.findAll()
-            .then(hours => res.status(200).json({Hours: hours}))
-            .catch(err => res.status(500).json({Error: err}));
+        try{
+            const hours = await Hours.findAll({attributes: {exclude: ['userId']}, include: [
+                {model: User, attributes: ['id', 'firstName', 'lastName']}
+            ]});
+            if(hours.length > 0){
+                res.status(200).json({Hours: hours});
+            }
+            else{
+                res.status(404).json({Message: 'No hours posted in system'});
+            }
+        }
+        catch(err){
+            res.status(500).json({Error: err});
+        }
     }
     else{
         res.status(403).json({Error: 'Not Authorized'});
@@ -53,14 +55,32 @@ router.get('/all', validateToken, (req,res) => {
 });
 
 // Get All Posted Hours By User Id
-router.get('/all/:userId', validateToken, (req, res) =>{
+router.get('/all/:userId', validateToken, async(req, res) =>{
     if(req.user.isManager){
-        Hours.findAll({where: {userId: req.params.userId}})
-            .then(hours => res.status(200).json({
-                Message: `All posted hours for Employee Id: ${req.params.userId}`,
-                Hours: hours
-            }))
-            .catch(err => res.status(500).json({Error: err}));
+        try{
+            const user = await User.findOne({where: {id: req.params.userId}});
+
+            if(user){
+                const hours = await Hours.findAll({where: {userId: req.params.userId}, attributes: {exclude: ['userId']}, include: [
+                    {model: User, attributes: ['firstName', 'lastName']}
+                ]});
+                if(hours.length > 0){
+                    res.status(200).json({
+                        Message: `All posted hours for Employee Id: ${req.params.userId}`,
+                        Hours: hours
+                    });
+                }
+                else{
+                    res.status(404).json({Error: `No Hours Found For User Id: ${req.params.userId}`});
+                }
+            }
+            else{
+                res.status(404).json({Error: `No User Found Matching User Id: ${req.params.userId}`});
+            }
+        }
+        catch(err){
+            res.status(500).json({Error: err});
+        }
     }
     else{
         res.status(403).json({Error: 'Not Authorized'});
@@ -68,60 +88,88 @@ router.get('/all/:userId', validateToken, (req, res) =>{
 });
 
 // Get Hours By Hours Id
-router.get('/:hoursId', validateToken, (req, res) => {
-    Hours.findOne({where: {id: req.params.hoursId}})
-        .then(hours => res.status(200).json({Hours: hours}))
-        .catch(err => res.status(500).json({Error: err}));
-});
-
-// Update Hours By Hour Id (Clock-Out)
-router.put('/:hoursId', validateToken, (req, res) => {
-    const hoursModel = {
-        clockIn: req.body.clockIn,
-        clockOut: req.body.clockOut
-    };
-
-    if(req.user.isAdmin){
-        Hours.update(hoursModel, {where: {id: req.params.hoursId}})
-            .then(hours => res.status(200).json({Hours: hours}))
-            .catch(err => res.status(500).json({Error: err}));
+router.get('/:hoursId', validateToken, async(req, res) => {
+    if(req.user.isManager){
+        try{
+            const hours = await Hours.findOne({where: {id: req.params.hoursId}, attributes: {exclude: ['userId']}, include: [
+                {model: User, attributes: ['id', 'firstName', 'lastName']}
+            ]});
+            if(hours){
+                res.status(200).json({Hours: hours});
+            }
+            else{
+                res.status(502).json({Error: `No Hours Found Matching Hours Id: ${req.params.hoursId}`});
+            }
+        }
+        catch(err){
+            res.status(500).json({Error: err});
+        }
     }
     else{
         res.status(403).json({Error: 'Not Authorized'});
     }
 });
 
-//! Is updating all hours posted by user, needs refactoring
-// Update User Hours By User Id 
-// router.put('/user/:userId', validateToken, (req, res) => {
-//     const hoursModel = {
-//         clockIn: req.body.clockIn,
-//         clockOut: req.body.clockOut
-//     };
 
-//     if(req.user.isAdmin){
-//         Hours.update(hoursModel, {where: {userId: req.params.userId}})
-//             // .then(hours => res.status(200).json({Hours: hours}))
-//             .then(() => res.status(200).json({Message: 'Hours successfully updated'}))
-//             .catch(err => res.status(500).json({Error: err}));
-//     }
-//     else{
-//         res.status(403).json({Error: 'Not Authorized'});
-//     }
-// });
+//?? Stopped Testing Here
 
-router.put('/user/:userId/:hoursId', validateToken, (req, res) => {
+// Update Hours By Hour Id (Clock-Out)
+router.put('/:hoursId', validateToken, async(req, res) => {
     const hoursModel = {
         clockIn: req.body.clockIn,
         clockOut: req.body.clockOut
     };
 
     if(req.user.isAdmin){
-        // Hours.findOne({where:{id: req.params.hoursId}})
-        Hours.update(hoursModel, {where: {userId: req.params.userId, id: req.params.hoursId}})
-            // .then(hours => res.status(200).json({Hours: hours}))
-            .then(() => res.status(200).json({Message: 'Hours successfully updated'}))
-            .catch(err => res.status(500).json({Error: err}));
+        try{
+            const hoursToUpdate = await Hours.findOne({where: {id: req.params.hoursId}});
+            if(hoursToUpdate){
+                await Hours.update(hoursModel, {where: {id: req.params.hoursId}});
+                res.status(200).json({Update_Hours: 'Successfully Updated User Hours'});
+            }
+            else{
+                res.status(404).json({Error: `No Hours Found Matching Hours Id: ${req.params.hoursId}`});
+            }
+        }
+        catch(err){
+            res.status(500).json({Error: err});
+        }
+    }
+    else{
+        res.status(403).json({Error: 'Not Authorized'});
+    }
+});
+
+// Update User Hours By User Id 
+router.put('/user/:userId/:hoursId', validateToken, async(req, res) => {
+    
+    if(req.user.isAdmin){
+        try{
+            const user = await User.findOne({where: {id: req.params.userId}});
+
+            if(user){
+                const hours = await Hours.findOne({where:{id: req.params.hoursId}});
+    
+                if(hours){
+                    const hoursModel = {
+                        clockIn: req.body.clockIn,
+                        clockOut: req.body.clockOut
+                    };
+    
+                    Hours.update(hoursModel, {where: {userId: req.params.userId, id: req.params.hoursId}});
+                    res.status(200).json({Update_Hours: 'Successfully Updated User Hours'});
+                }
+                else{
+                    res.status(404).json({Error: `No Hours Found Matching Hours Id: ${req.params.hoursId}`});
+                }
+            }
+            else{
+                res.status(404).json({Error: `No User Found Matching User Id: ${req.params.userId}`});
+            }
+        }
+        catch(err){
+            res.status(500).json({Error: err})
+        }
     }
     else{
         res.status(403).json({Error: 'Not Authorized'});
