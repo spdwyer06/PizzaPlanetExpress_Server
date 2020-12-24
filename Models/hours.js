@@ -17,9 +17,13 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TIME
         },
         shiftLength: {
-            type: DataTypes.DECIMAL
+            type: DataTypes.DECIMAL(10, 2),
+            set(){
+                this.shiftLength = this.clockOut - this.clockIn;
+            }
         }
-    });
+    },
+    {timestamps: false});
 
     return Hours;
 }

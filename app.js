@@ -13,8 +13,8 @@ app.use(Express.json());
 app.use('/user', require('./Controllers/userController'));
 app.use('/menuItem', require('./Controllers/menuItemController'));
 app.use('/customer', require('./Controllers/customerController'));
-// Currently Under Final Testing
 app.use('/order', require('./Controllers/orderController'));
+// Currently Under Final Testing
 app.use('/hours', require('./Controllers/hoursController'));
 
 

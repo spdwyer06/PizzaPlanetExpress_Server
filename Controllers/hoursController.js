@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const Hours = require('../db').import('../Models/hours');
-// const e = require('express');
+const User = require('../db').import('../Models/user');
 const validateToken = require('../Middleware/validateToken');
 
 // Create Hours (Clock-In)
@@ -14,15 +14,17 @@ router.post('/clockIn', validateToken, async(req, res) => {
     const today = new Date().toLocaleDateString();
 
     const hoursModel = {
-        employeeId: req.user.id,
+        // employeeId: req.user.id,
         date: today,
         clockIn: rightNow,
         userId: req.user.id
     };
 
+
     try{
         const hours = await Hours.create(hoursModel);
-        res.status(200).json(hours);
+        res.status(200).json({ClockIn: `Clocked In At ${hours.clockIn}`});
+        // res.status(200).json(hours);
     }
     catch(err){
         res.status(500).json({Error: err});
@@ -33,12 +35,14 @@ router.post('/clockIn', validateToken, async(req, res) => {
 router.get('/all', validateToken, async(req,res) => {
     if(req.user.isManager){
         try{
-            const hours = await Hours.findAll();
+            const hours = await Hours.findAll({attributes: {exclude: ['userId']}, include: [
+                {model: User, attributes: ['id', 'firstName', 'lastName']}
+            ]});
             if(hours.length > 0){
                 res.status(200).json({Hours: hours});
             }
             else{
-                res.status(502).json({Message: 'No hours posted in system'});
+                res.status(404).json({Message: 'No hours posted in system'});
             }
         }
         catch(err){
@@ -54,15 +58,24 @@ router.get('/all', validateToken, async(req,res) => {
 router.get('/all/:userId', validateToken, async(req, res) =>{
     if(req.user.isManager){
         try{
-            const hours = await Hours.findAll({where: {userId: req.params.userId}});
-            if(hours.length > 0){
-                res.status(200).json({
-                    Message: `All posted hours for Employee Id: ${req.params.userId}`,
-                    Hours: hours
-                });
+            const user = await User.findOne({where: {id: req.params.userId}});
+
+            if(user){
+                const hours = await Hours.findAll({where: {userId: req.params.userId}, attributes: {exclude: ['userId']}, include: [
+                    {model: User, attributes: ['firstName', 'lastName']}
+                ]});
+                if(hours.length > 0){
+                    res.status(200).json({
+                        Message: `All posted hours for Employee Id: ${req.params.userId}`,
+                        Hours: hours
+                    });
+                }
+                else{
+                    res.status(404).json({Error: `No Hours Found For User Id: ${req.params.userId}`});
+                }
             }
             else{
-                res.status(502).json({Error: `No Hours Found For User Id: ${req.params.userId}`});
+                res.status(404).json({Error: `No User Found Matching User Id: ${req.params.userId}`});
             }
         }
         catch(err){
@@ -76,33 +89,13 @@ router.get('/all/:userId', validateToken, async(req, res) =>{
 
 // Get Hours By Hours Id
 router.get('/:hoursId', validateToken, async(req, res) => {
-    try{
-        const hours = await Hours.findOne({where: {id: req.params.hoursId}});
-        if(hours){
-            res.status(200).json({Hours: hours});
-        }
-        else{
-            res.status(502).json({Error: `No Hours Found Matching Hours Id: ${req.params.hoursId}`});
-        }
-    }
-    catch(err){
-        res.status(500).json({Error: err});
-    }
-});
-
-// Update Hours By Hour Id (Clock-Out)
-router.put('/:hoursId', validateToken, async(req, res) => {
-    const hoursModel = {
-        clockIn: req.body.clockIn,
-        clockOut: req.body.clockOut
-    };
-
-    if(req.user.isAdmin){
+    if(req.user.isManager){
         try{
-            const hoursToUpdate = await Hours.findOne({where: {id: req.params.hoursId}});
-            if(hoursToUpdate){
-                await Hours.update(hoursModel, {where: {id: req.params.hoursId}});
-                res.status(200).json({Update_Hours: 'Successfully updated user hours'});
+            const hours = await Hours.findOne({where: {id: req.params.hoursId}, attributes: {exclude: ['userId']}, include: [
+                {model: User, attributes: ['id', 'firstName', 'lastName']}
+            ]});
+            if(hours){
+                res.status(200).json({Hours: hours});
             }
             else{
                 res.status(502).json({Error: `No Hours Found Matching Hours Id: ${req.params.hoursId}`});
@@ -117,8 +110,11 @@ router.put('/:hoursId', validateToken, async(req, res) => {
     }
 });
 
-// Update User Hours By User Id 
-router.put('/user/:userId/:hoursId', validateToken, async(req, res) => {
+
+//?? Stopped Testing Here
+
+// Update Hours By Hour Id (Clock-Out)
+router.put('/:hoursId', validateToken, async(req, res) => {
     const hoursModel = {
         clockIn: req.body.clockIn,
         clockOut: req.body.clockOut
@@ -126,13 +122,49 @@ router.put('/user/:userId/:hoursId', validateToken, async(req, res) => {
 
     if(req.user.isAdmin){
         try{
-            const hours = await Hours.findOne({where:{id: req.params.hoursId}});
-            if(hours){
-                Hours.update(hoursModel, {where: {userId: req.params.userId, id: req.params.hoursId}});
-                res.status(200).json({Message: 'Hours successfully updated'});
+            const hoursToUpdate = await Hours.findOne({where: {id: req.params.hoursId}});
+            if(hoursToUpdate){
+                await Hours.update(hoursModel, {where: {id: req.params.hoursId}});
+                res.status(200).json({Update_Hours: 'Successfully Updated User Hours'});
             }
             else{
-                res.status(502).json({Error: `No Hours Found Matching Hours Id: ${req.params.hoursId}`});
+                res.status(404).json({Error: `No Hours Found Matching Hours Id: ${req.params.hoursId}`});
+            }
+        }
+        catch(err){
+            res.status(500).json({Error: err});
+        }
+    }
+    else{
+        res.status(403).json({Error: 'Not Authorized'});
+    }
+});
+
+// Update User Hours By User Id 
+router.put('/user/:userId/:hoursId', validateToken, async(req, res) => {
+    
+    if(req.user.isAdmin){
+        try{
+            const user = await User.findOne({where: {id: req.params.userId}});
+
+            if(user){
+                const hours = await Hours.findOne({where:{id: req.params.hoursId}});
+    
+                if(hours){
+                    const hoursModel = {
+                        clockIn: req.body.clockIn,
+                        clockOut: req.body.clockOut
+                    };
+    
+                    Hours.update(hoursModel, {where: {userId: req.params.userId, id: req.params.hoursId}});
+                    res.status(200).json({Update_Hours: 'Successfully Updated User Hours'});
+                }
+                else{
+                    res.status(404).json({Error: `No Hours Found Matching Hours Id: ${req.params.hoursId}`});
+                }
+            }
+            else{
+                res.status(404).json({Error: `No User Found Matching User Id: ${req.params.userId}`});
             }
         }
         catch(err){
