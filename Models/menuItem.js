@@ -19,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
                 notNull: {
                     msg: 'Enter the item price.'
                 }
+            },
+            get(){
+                return parseFloat(this.getDataValue('price'));
             }
         }
     });

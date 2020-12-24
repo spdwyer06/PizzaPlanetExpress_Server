@@ -3,7 +3,7 @@ const Express = require('express');
 const app = Express();
 const db = require('./db');
 
-//{force: true} inside .sync() "drops all tables" each time server runs. enter and delete in order to drop tables only once.
+// {force: true} inside .sync() "drops all tables" each time server runs
 db.sync(); 
 // db.sync({force: true});
 app.use(require('./Middleware/headers'));

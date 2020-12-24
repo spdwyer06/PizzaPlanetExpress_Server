@@ -4,88 +4,151 @@ const Order = require('../db').import('../Models/order');
 const MenuItem = require('../db').import('../Models/menuItem');
 const User = require('../db').import('../Models/user');
 const Customer = require('../db').import('../Models/customer');
+const OrderItem = require('../db').import('../Models/orderItem');
 
 
 
 // Create Starting Order
 router.post('/create/:customerId', validateToken, async(req, res) => {
-    const orderModel = {
-        userId: req.user.id,
-        customerId: req.params.customerId,
-        isPaid: req.body.isPaid
-    };
-
     try{
-        const order = await Order.create(orderModel);
-        res.status(200).json({
-            Message: 'Starting order successfully created',
-            //? Needed since order will just be an empty order to begin with???
-            Order: order
-        });
+        const customer = await Customer.findOne({where: {id: req.params.customerId}});
+        if(customer){
+            const orderModel = {
+                userId: req.user.id,
+                customerId: customer.id,
+                isPaid: req.body.isPaid
+            };
+    
+            const order = await Order.create(orderModel);
+            res.status(200).json({
+                Message: 'Starting Order Successfully Created',
+                //? Needed since order will just be an empty order to begin with???
+                OrderId: order.id
+            });
+        }
+        else{
+            res.status(500).json({Error: `No Customer Found Matching Customer Id: ${req.params.customerId}`});
+        }
     }
     catch{
         res.status(200).json({Error: err});
     }
 });
 
-// Add Item By Item Id To Order By Order Id
+// Add A Item To Order By Order Id
 router.put('/food/:itemId/add/:orderId', validateToken, async(req, res) => {
     try{
         const order = await Order.findOne({where: {id: req.params.orderId}});
-        const menuItem = await MenuItem.findOne({where: {id: req.params.itemId}});
-        const addItem = await order.addMenuItem(menuItem, {through: {quantity: req.body.quantity, specialInstructions: req.body.specialInstructions}});
-        
-        res.status(200).json({Added_Item: addItem});
+
+        const orderTotal = order.totalPrice;
+        console.log('PrevTotal', orderTotal);
+
+        if(order){
+            const menuItem = await MenuItem.findOne({where: {id: req.params.itemId}});
+    
+            if(menuItem){
+                const addItem = await OrderItem.create({
+                    orderId: order.id,
+                    menuItemId: menuItem.id,
+                    quantity: req.body.quantity,
+                    specialInstructions: req.body.specialInstructions
+                });
+
+                const newOrderTotal = {
+                   totalPrice: (orderTotal + addItem.quantity * menuItem.price)
+                };
+                console.log('NewTotal', newOrderTotal.totalPrice);
+                    
+                await Order.update(newOrderTotal, {where: {id: order.id}});
+
+                res.status(200).json({Added_Item: ([`Items Added To Order #${order.id}:`, `${addItem.quantity} x ${menuItem.name.charAt(0).toUpperCase() + menuItem.name.slice(1)}`])});
+            }
+            else{
+                res.status(500).json({Error: `No Menu Item Found Matching Id: ${req.params.itemId}`});
+            }
+        }
+        else{
+            res.status(500).json({Error: `No Order Found Matching Order Id: ${req.params.orderId}`});
+        }
     }
     catch(err){
         res.status(500).json({Error: err});
     }
 });
 
-// Add Items To Order By Order Id
-router.put('/add/:orderId', validateToken, async(req, res) => {
-    let orderTotal = 0;
+// Add A Item To Order By Order Id (Needs Refactored => Won't Add Duplicates)
+// router.put('/food/:itemId/add/:orderId', validateToken, async(req, res) => {
+//     try{
+//         const order = await Order.findOne({where: {id: req.params.orderId}});
 
-    if(await Order.findOne({where: {id: req.params.orderId}})){
-        for(const itemId of req.body.orderDetail){
-            const item = await MenuItem.findOne({where: {id: itemId}});
-            if(item){
-                orderTotal += parseFloat(item.price).valueOf(item.price);
-            }
-            else{
-                res.status(500).json({
-                    Error: `No Item Found In System Matching Menu Item Id: ${itemId}`,
-                    '?': 'Contact Technical Support For Assistance'
-                });
-            }
-        }
+//         if(order){
+//             const menuItem = await MenuItem.findOne({where: {id: req.params.itemId}});
     
-        const orderModel = {
-            // Have include name of menu item
-            orderDetail: req.body.orderDetail,
-            totalPrice: orderTotal
-        };
-    
-        try{
-            await Order.update(orderModel, {where: {id: req.params.orderId}});
-            res.status(200).json({Message: 'Item(s) added to order'});
-        }
-        catch(err){
-            res.status(500).json({Error: err});
-        }
-    }
-    else{
-        res.status(502).json({Error: `No Order Found Matching Order Id: ${req.params.orderId}`});
-    }
+//             if(menuItem){
+//                 const addItem = await order.addMenuItem(menuItem, {through: {quantity: req.body.quantity, specialInstructions: req.body.specialInstructions}});
+                    
+//                 res.status(200).json({Added_Item: `Added ${menuItem.name} to Order #${order.id}`});
+//             }
+//             else{
+//                 res.status(500).json({Error: `No Menu Item Found Matching Id: ${req.params.itemId}`});
+//             }
+//         }
+//         else{
+//             res.status(500).json({Error: `No Order Found Matching Order Id: ${req.params.orderId}`});
+//         }
+//     }
+//     catch(err){
+//         res.status(500).json({Error: err});
+//     }
+// });
 
-});
+// Add Items To Order By Order Id (OLD)
+// router.put('/add/:orderId', validateToken, async(req, res) => {
+//     let orderTotal = 0;
+
+//     if(await Order.findOne({where: {id: req.params.orderId}})){
+//         for(const itemId of req.body.orderDetail){
+//             const item = await MenuItem.findOne({where: {id: itemId}});
+//             if(item){
+//                 orderTotal += parseFloat(item.price).valueOf(item.price);
+//             }
+//             else{
+//                 res.status(500).json({
+//                     Error: `No Item Found In System Matching Menu Item Id: ${itemId}`,
+//                     '?': 'Contact Technical Support For Assistance'
+//                 });
+//             }
+//         }
+    
+//         const orderModel = {
+//             // Have include name of menu item
+//             orderDetail: req.body.orderDetail,
+//             totalPrice: orderTotal
+//         };
+    
+//         try{
+//             await Order.update(orderModel, {where: {id: req.params.orderId}});
+//             res.status(200).json({Message: 'Item(s) added to order'});
+//         }
+//         catch(err){
+//             res.status(500).json({Error: err});
+//         }
+//     }
+//     else{
+//         res.status(502).json({Error: `No Order Found Matching Order Id: ${req.params.orderId}`});
+//     }
+
+// });
+
 
 // Get All Orders
 router.get('/all', validateToken, async(req, res) => {
     try{
-        let orders = await Order.findAll({include: [
-            {model: MenuItem, attributes: ['name', 'price'], through: {attributes: []}}, 
-            {model: Customer, attributes: ['firstName', 'lastName', 'phoneNumber']}
+        let orders = await Order.findAll({attributes: {exclude: ['createdAt', 'updatedAt']}, include: [
+            // {model: User, as: 'Employee', attributes: ['firstName', 'lastName']},
+            {model: User, attributes: ['firstName', 'lastName']},
+            {model: MenuItem, attributes: ['name', 'price'], through: {attributes: ['quantity']}}, 
+            {model: Customer, attributes: ['firstName', 'lastName', 'phoneNumber']},
         ]});
         if(orders.length > 0){
             res.status(200).json({Orders: orders});
@@ -118,7 +181,7 @@ router.get('/:orderId', validateToken, async(req, res) => {
 // Get All Orders By Customer Phone Number
 router.get('/cust/:phone', validateToken, async(req, res) => {
     try{
-        const orders = await Order.findAll({where: {customerPhoneNumber: req.params.phone}});
+        const orders = await Customer.findAll({where: {phoneNumber: req.params.phone}});
         if(orders.length > 0){
             res.status(200).json({Orders: orders});
         }
@@ -135,7 +198,7 @@ router.get('/cust/:phone', validateToken, async(req, res) => {
 router.get('/user/:userId', validateToken, async(req, res) => {
     try{
         if(await User.findOne({where: {id: req.params.userId}})){
-            const orders = await Order.findAll({where: {userId: req.params.userId}});
+            const orders = await Order.findAll({where: {userId: req.params.userId}, attributes: {exclude: ['createdAt', 'updatedAt', 'userId']}});
             res.status(200).json({Orders: orders});
         }
         else{
@@ -150,8 +213,8 @@ router.get('/user/:userId', validateToken, async(req, res) => {
 // Get All Un-paid Orders
 router.get('/paid/unpaid', validateToken, async(req, res) => {
     try{
-        const orders = await Order.findAll({where: {isPaid: false}});
-        if(order.length > 0){
+        const orders = await Order.findAll({where: {isPaid: false}, attributes: {exclude: ['createdAt', 'updatedAt', 'isPaid']}});
+        if(orders.length > 0){
             res.status(200).json({Unpaid_Orders: orders});
         }
         else{
@@ -166,7 +229,7 @@ router.get('/paid/unpaid', validateToken, async(req, res) => {
 // Get All Paid Orders
 router.get('/paid/paid', validateToken, async(req, res) => {
     try{
-        const orders = await Order.findAll({where: {isPaid: true}});
+        const orders = await Order.findAll({where: {isPaid: true}, attributes: {exclude: ['createdAt', 'updatedAt', 'isPaid']}});
         if(orders.length > 0){
             res.status(200).json({Paid_Orders: orders});
         }
@@ -193,7 +256,7 @@ router.put('/:orderId', validateToken, async (req, res) => {
     
         try{
             await Order.update(orderModel, {where: {id: req.params.orderId}});
-            res.status(200).json({Message: 'Order successfully updated'});
+            res.status(200).json({Message: 'Order Successfully Updated'});
         }
         catch(err){
             res.status(500).json({Error: err});
@@ -211,7 +274,7 @@ router.delete('/:orderId', validateToken, async(req, res) => {
         try{
             if(await Order.findOne({where: {id: req.params.orderId}})){
                 await Order.destroy({where: {id: req.params.orderId}});
-                res.status(200).json({Message: 'Order has been removed from system'});
+                res.status(200).json({Message: 'Order Has Been Removed From System'});
             }
             else{
                 res.status(502).json({Error: `No Order Found Matching Order Id:  ${req.params.orderId}`});
