@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const validateToken = require('../Middleware/validateToken');
 // const validateManager = require('../Middleware/validateManager');
 
+//? Add auth here? Only managers+ can create new users? 
 // Create User
 router.post('/create', async(req, res) => {
     try{
