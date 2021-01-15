@@ -42,7 +42,7 @@ router.get('/all', validateToken, async(req,res) => {
                 res.status(200).json({Hours: hours});
             }
             else{
-                res.status(404).json({Message: 'No hours posted in system'});
+                res.status(404).json({Message: 'No Hours Posted In System Yet'});
             }
         }
         catch(err){
@@ -115,15 +115,23 @@ router.get('/:hoursId', validateToken, async(req, res) => {
 
 // Update Hours By Hour Id (Clock-Out)
 router.put('/:hoursId', validateToken, async(req, res) => {
-    const hoursModel = {
-        clockIn: req.body.clockIn,
-        clockOut: req.body.clockOut
-    };
-
     if(req.user.isAdmin){
         try{
             const hoursToUpdate = await Hours.findOne({where: {id: req.params.hoursId}});
             if(hoursToUpdate){
+                let rightNow = new Date();
+                const hour = rightNow.getHours();
+                const minute = rightNow.getMinutes();
+                const second = rightNow.getSeconds();
+                rightNow = `${hour}:${minute}:${second}`;
+
+                const hoursModel = {
+                    clockIn: req.body.clockIn,
+                    clockOut: rightNow
+                };
+
+                console.log('*******', rightNow);
+
                 await Hours.update(hoursModel, {where: {id: req.params.hoursId}});
                 res.status(200).json({Update_Hours: 'Successfully Updated User Hours'});
             }
@@ -142,7 +150,6 @@ router.put('/:hoursId', validateToken, async(req, res) => {
 
 // Update User Hours By User Id 
 router.put('/user/:userId/:hoursId', validateToken, async(req, res) => {
-    
     if(req.user.isAdmin){
         try{
             const user = await User.findOne({where: {id: req.params.userId}});
@@ -156,7 +163,7 @@ router.put('/user/:userId/:hoursId', validateToken, async(req, res) => {
                         clockOut: req.body.clockOut
                     };
     
-                    Hours.update(hoursModel, {where: {userId: req.params.userId, id: req.params.hoursId}});
+                    await Hours.update(hoursModel, {where: {userId: req.params.userId, id: req.params.hoursId}});
                     res.status(200).json({Update_Hours: 'Successfully Updated User Hours'});
                 }
                 else{
@@ -175,6 +182,7 @@ router.put('/user/:userId/:hoursId', validateToken, async(req, res) => {
         res.status(403).json({Error: 'Not Authorized'});
     }
 });
+
 
 
 
