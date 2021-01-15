@@ -1,12 +1,16 @@
 const Sequelize = require('sequelize');
 // const customer = require('./Models/customer');
 
-const db = new Sequelize(process.env.DB_NAME, 'postgres', process.env.PASS, {
-    host: 'localhost',
+// const db = new Sequelize(process.env.DB_NAME, 'postgres', process.env.PASS, {
+//     host: 'localhost',
+//     dialect: 'postgres'
+//     // dialectOptions: {
+//     //     decimalNumbers: true
+//     // }
+// });
+
+const db = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres'
-    // dialectOptions: {
-    //     decimalNumbers: true
-    // }
 });
 
 db.authenticate()
