@@ -40,10 +40,11 @@ router.put('/food/:itemId/add/:orderId', validateToken, async(req, res) => {
     try{
         const order = await Order.findOne({where: {id: req.params.orderId}});
 
-        const orderTotal = order.totalPrice;
-        console.log('PrevTotal', orderTotal);
-
+        
         if(order){
+            const orderTotal = order.totalPrice;
+            console.log('PrevTotal', orderTotal);
+
             const menuItem = await MenuItem.findOne({where: {id: req.params.itemId}});
     
             if(menuItem){
@@ -55,7 +56,7 @@ router.put('/food/:itemId/add/:orderId', validateToken, async(req, res) => {
                 });
 
                 const newOrderTotal = {
-                   totalPrice: (orderTotal + addItem.quantity * menuItem.price)
+                   totalPrice: (orderTotal + (addItem.quantity * menuItem.price))
                 };
                 console.log('NewTotal', newOrderTotal.totalPrice);
                     
@@ -94,8 +95,16 @@ router.put('/food/:itemName/update/:orderId', validateToken, async(req, res) => 
                     try{
                         await OrderItem.update({quantity: req.body.quantity}, {where: {orderId: order.id, menuItemId: menuItem.id}});
 
+                        const originalTotal = order.totalPrice;
+                        const itemPrice = menuItem.price;
+                        const originalQuantity = orderItem.quantity;
+                        const newQuantity = req.body.quantity;
+                        const addingPrice = (newQuantity - originalQuantity) * itemPrice;
+                        const newTotal = originalTotal + addingPrice;
+
                         const newOrderTotal = {
-                            totalPrice: (req.body.quantity * menuItem.price)
+                            // totalPrice: (order.totalPrice + (req.body.quantity * menuItem.price))
+                            totalPrice: newTotal
                          };
      
                          console.log('NewTotal', newOrderTotal.totalPrice);
