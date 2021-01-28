@@ -103,7 +103,6 @@ router.put('/food/:itemName/update/:orderId', validateToken, async(req, res) => 
                         const newTotal = originalTotal + addingPrice;
 
                         const newOrderTotal = {
-                            // totalPrice: (order.totalPrice + (req.body.quantity * menuItem.price))
                             totalPrice: newTotal
                          };
      
@@ -116,14 +115,6 @@ router.put('/food/:itemName/update/:orderId', validateToken, async(req, res) => 
                     catch(err){
                         res.status(500).json({Error: err.Message});
                     }
-
-                    // const newOrderTotal = {
-                    //    totalPrice: (orderTotal + req.body.quantity * menuItem.price)
-                    // };
-
-                    // console.log('NewTotal', newOrderTotal.totalPrice);
-                        
-                    // await Order.update(newOrderTotal, {where: {id: order.id}});
                 }
                 else{
                     res.status(500).json({Error: `Menu Item Is Not On Order Id: ${req.params.orderId}`});
