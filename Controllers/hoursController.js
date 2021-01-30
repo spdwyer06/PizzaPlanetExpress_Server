@@ -1,7 +1,7 @@
 const router = require('express').Router();
-const Hours = require('../db').import('../Models/hours');
-const User = require('../db').import('../Models/user');
-const validateToken = require('../Middleware/validateToken');
+const Hours = require('../db').import('../models/hours');
+const User = require('../db').import('../models/user');
+const validateToken = require('../middleware/validateToken');
 
 // Create Hours (Clock-In)
 router.post('/clockIn', validateToken, async(req, res) => {

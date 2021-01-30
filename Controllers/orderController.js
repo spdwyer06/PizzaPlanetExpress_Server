@@ -1,10 +1,10 @@
 const router = require('express').Router();
-const validateToken = require('../Middleware/validateToken');
-const Order = require('../db').import('../Models/order');
-const MenuItem = require('../db').import('../Models/menuItem');
-const User = require('../db').import('../Models/user');
-const Customer = require('../db').import('../Models/customer');
-const OrderItem = require('../db').import('../Models/orderItem');
+const validateToken = require('../middleware/validateToken');
+const Order = require('../db').import('../models/order');
+const MenuItem = require('../db').import('../models/menuItem');
+const User = require('../db').import('../models/user');
+const Customer = require('../db').import('../models/customer');
+const OrderItem = require('../db').import('../models/orderItem');
 
 
 

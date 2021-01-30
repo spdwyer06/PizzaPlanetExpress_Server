@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const MenuItem = require('../db').import('../Models/menuItem');
-const validateToken = require('../Middleware/validateToken');
+const MenuItem = require('../db').import('../models/menuItem');
+const validateToken = require('../middleware/validateToken');
 
 // Create Menu Item
 router.post('/create', validateToken, async(req, res) => {

@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const User = require('../db').import('../Models/user');
+const User = require('../db').import('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const validateToken = require('../Middleware/validateToken');
+const validateToken = require('../middleware/validateToken');
 // const validateManager = require('../Middleware/validateManager');
 
 //? Add auth here? Only managers+ can create new users? 

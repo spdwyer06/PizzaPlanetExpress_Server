@@ -17,12 +17,12 @@ db.authenticate()
     .then(() => console.log('Postgres db connected'))
     .catch(err => console.log(err));
 
-User = db.import('./Models/user');
-Hours = db.import('./Models/hours');
-MenuItem = db.import('./Models/menuItem');
-Order = db.import('./Models/order');
-OrderItem = db.import('./Models/orderItem');
-Customer = db.import('./Models/customer');
+User = db.import('./models/user');
+Hours = db.import('./models/hours');
+MenuItem = db.import('./models/menuItem');
+Order = db.import('./models/order');
+OrderItem = db.import('./models/orderItem');
+Customer = db.import('./models/customer');
 
 // User 1:M Hours
 User.hasMany(Hours);

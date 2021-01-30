@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const validateToken = require('../Middleware/validateToken');
-const Customer = require('../db').import('../Models/customer');
+const validateToken = require('../middleware/validateToken');
+const Customer = require('../db').import('../models/customer');
 
 router.route('/')
     // Create Customer
