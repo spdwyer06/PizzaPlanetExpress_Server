@@ -110,9 +110,6 @@ router.get('/:hoursId', validateToken, async(req, res) => {
     }
 });
 
-
-//?? Stopped Testing Here
-
 // Update Hours By Hour Id (Clock-Out)
 router.put('/:hoursId', validateToken, async(req, res) => {
     if(req.user.isAdmin){
