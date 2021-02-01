@@ -14,7 +14,6 @@ app.use('/user', require('./controllers/userController'));
 app.use('/menuItem', require('./controllers/menuItemController'));
 app.use('/customer', require('./controllers/customerController'));
 app.use('/order', require('./controllers/orderController'));
-// Currently Under Final Testing
 app.use('/hours', require('./controllers/hoursController'));
 
 

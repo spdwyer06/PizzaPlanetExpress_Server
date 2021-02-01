@@ -9,7 +9,6 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: true
             }
             // defaultValue: DataTypes.NOW
-            // defaultValue: Sequelize.NOW
         },
         clockIn: {
             type: DataTypes.TIME,
