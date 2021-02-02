@@ -1,4 +1,3 @@
-// const MenuItem = require('./menuItem');
 const moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
@@ -20,25 +19,6 @@ module.exports = (sequelize, DataTypes) => {
                 return parseFloat(this.getDataValue('totalPrice'));
             }
         },
-        // orderDetail: {
-        //     type: DataTypes.ARRAY(DataTypes.INTEGER)
-        // },
-        // orderDate: {
-        //     type: DataTypes.DATE,
-        //     defaultValue: new Date()
-        // }
-        // orderDetail: {
-        //     type: DataTypes.ARRAY(MenuItem),
-        // },
-        // orderDetail: {
-        //     type: DataTypes.STRING,
-        //     get(){
-        //         const val = this.getDataValue('orderDetail');
-        //         return val;
-        //     }
-        //     // get: () => JSON.parse(this.getDataValue(orderDetail)),
-        //     // set: (val) => this.setDataValue('orderDetail', JSON.stringify(val))
-        // },
         isPaid: {
             type: DataTypes.BOOLEAN,
             defaultValue: false

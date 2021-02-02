@@ -76,6 +76,7 @@ router.put('/food/:itemId/add/:orderId', validateToken, async(req, res) => {
     }
 });
 
+<<<<<<< HEAD
 // Update Order Item Quantity
 router.put('/food/:itemName/update/:orderId', validateToken, async(req, res) => {
     try{
@@ -197,6 +198,8 @@ router.put('/food/:itemName/update/:orderId', validateToken, async(req, res) => 
 // });
 
 
+=======
+>>>>>>> 58a83614f67a298b0ac7cecaeb2a21578f9d5c83
 // Get All Orders
 router.get('/all', validateToken, async(req, res) => {
     try{
