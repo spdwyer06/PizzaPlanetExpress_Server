@@ -25,7 +25,6 @@ module.exports = (sequelize, DataTypes) => {
                 args: true,
                 msg: 'Password already in use'
             },
-            // unique: true,
             validate: {
                 notNull: true,
                 isInt: true,
