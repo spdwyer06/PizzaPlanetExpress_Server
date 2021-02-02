@@ -9,7 +9,6 @@ const validateToken = require('../middleware/validateToken');
 router.post('/create', async(req, res) => {
     try{
         const users = await User.findAll();
-        // console.log('Users', users);
         if(users.length > 0){
             const user = await User.create({
                 firstName: req.body.firstName,

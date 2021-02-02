@@ -159,44 +159,6 @@ router.put('/food/:itemName/update/:orderId', validateToken, async(req, res) => 
 //     }
 // });
 
-// Add Items To Order By Order Id (OLD)
-// router.put('/add/:orderId', validateToken, async(req, res) => {
-//     let orderTotal = 0;
-
-//     if(await Order.findOne({where: {id: req.params.orderId}})){
-//         for(const itemId of req.body.orderDetail){
-//             const item = await MenuItem.findOne({where: {id: itemId}});
-//             if(item){
-//                 orderTotal += parseFloat(item.price).valueOf(item.price);
-//             }
-//             else{
-//                 res.status(500).json({
-//                     Error: `No Item Found In System Matching Menu Item Id: ${itemId}`,
-//                     '?': 'Contact Technical Support For Assistance'
-//                 });
-//             }
-//         }
-    
-//         const orderModel = {
-//             // Have include name of menu item
-//             orderDetail: req.body.orderDetail,
-//             totalPrice: orderTotal
-//         };
-    
-//         try{
-//             await Order.update(orderModel, {where: {id: req.params.orderId}});
-//             res.status(200).json({Message: 'Item(s) added to order'});
-//         }
-//         catch(err){
-//             res.status(500).json({Error: err});
-//         }
-//     }
-//     else{
-//         res.status(502).json({Error: `No Order Found Matching Order Id: ${req.params.orderId}`});
-//     }
-
-// });
-
 // Get All Orders
 router.get('/all', validateToken, async(req, res) => {
     try{
