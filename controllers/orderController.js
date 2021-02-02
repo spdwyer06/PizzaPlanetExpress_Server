@@ -76,6 +76,62 @@ router.put('/food/:itemId/add/:orderId', validateToken, async(req, res) => {
     }
 });
 
+// Update Order Item Quantity
+router.put('/food/:itemName/update/:orderId', validateToken, async(req, res) => {
+    try{
+        const order = await Order.findOne({where: {id: req.params.orderId}});
+
+        const orderTotal = order.totalPrice;
+        console.log('PrevTotal', orderTotal);
+
+        if(order){
+            const menuItem = await MenuItem.findOne({where: {name: req.params.itemName}});
+    
+            if(menuItem){
+                const orderItem = await OrderItem.findOne({where: {orderId: order.id, menuItemId: menuItem.id}});
+
+                if(orderItem){
+                    try{
+                        await OrderItem.update({quantity: req.body.quantity}, {where: {orderId: order.id, menuItemId: menuItem.id}});
+
+                        const originalTotal = order.totalPrice;
+                        const itemPrice = menuItem.price;
+                        const originalQuantity = orderItem.quantity;
+                        const newQuantity = req.body.quantity;
+                        const addingPrice = (newQuantity - originalQuantity) * itemPrice;
+                        const newTotal = originalTotal + addingPrice;
+
+                        const newOrderTotal = {
+                            totalPrice: newTotal
+                         };
+     
+                         console.log('NewTotal', newOrderTotal.totalPrice);
+                             
+                         await Order.update(newOrderTotal, {where: {id: order.id}});
+
+                        res.status(200).json({Message: 'Order item successfully updated'});
+                    }
+                    catch(err){
+                        res.status(500).json({Error: err.Message});
+                    }
+                }
+                else{
+                    res.status(500).json({Error: `Menu Item Is Not On Order Id: ${req.params.orderId}`});
+                }
+            }
+            else{
+                res.status(500).json({Error: `No Menu Item Found Matching Name: ${req.params.itemName}`});
+            }
+        }
+        else{
+            res.status(500).json({Error: `No Order Found Matching Order Id: ${req.params.orderId}`});
+        }
+    }
+    catch(err){
+        res.status(500).json({Error: err});
+    }
+});
+
 // Add A Item To Order By Order Id (Needs Refactored => Won't Add Duplicates)
 // router.put('/food/:itemId/add/:orderId', validateToken, async(req, res) => {
 //     try{
