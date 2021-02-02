@@ -9,22 +9,44 @@ const validateToken = require('../middleware/validateToken');
 // Create User
 router.post('/create', async(req, res) => {
     try{
-        const user = await User.create({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            password: req.body.password,
-            passwordEncrypted: bcrypt.hashSync(req.body.password.toString(), 13),
-            isManager: req.body.isManager,
-            isAdmin: req.body.isAdmin
-        });
+        const users = await User.findAll();
+        // console.log('Users', users);
+        if(users.length > 0){
+            const user = await User.create({
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                password: req.body.password,
+                passwordEncrypted: bcrypt.hashSync(req.body.password.toString(), 13),
+                isManager: req.body.isManager,
+                isAdmin: req.body.isAdmin
+            });
+
+            const token = await jwt.sign({id: user.id}, process.env.JWT, {expiresIn: '7d'});
     
-        const token = await jwt.sign({id: user.id}, process.env.JWT, {expiresIn: '7d'});
+            res.status(200).json({
+                User: user,
+                User_Token: token,
+                Message: 'User Successfully Created'
+            });
+        }
+        else{
+            const user = await User.create({
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                password: req.body.password,
+                passwordEncrypted: bcrypt.hashSync(req.body.password.toString(), 13),
+                isManager: true,
+                isAdmin: true
+            });
+
+            const token = await jwt.sign({id: user.id}, process.env.JWT, {expiresIn: '7d'});
     
-        res.status(200).json({
-            User: user,
-            User_Token: token,
-            Message: 'User Successfully Created'
-        });
+            res.status(200).json({
+                User: user,
+                User_Token: token,
+                Message: 'User Successfully Created'
+            });
+        }
     }
     catch(err){
         res.status(500).json({Error: err});
